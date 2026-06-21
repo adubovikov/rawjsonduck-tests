@@ -47,7 +47,20 @@ SQL files use `{{ROOT}}` placeholders; runners substitute the repo root automati
 
 Prints DuckDB tables: write speed, read speed (per query + average), disk size, and a combined summary.
 
-**Sample 50k run:** [`results/sample/benchmark_50k.txt`](results/sample/benchmark_50k.txt)
+Full log: [`results/sample/benchmark_50k.txt`](results/sample/benchmark_50k.txt)
+
+### Results summary (50,000 rows, ~6.1 MB NDJSON, Linux x86_64, best of 3 runs)
+
+| Storage | Write (ms) | Write rows/s | Read avg (ms) | Disk (MB) | Write × | Read × | Disk × |
+|---------|------------|--------------|---------------|-----------|---------|--------|--------|
+| **rawduck** | 102 | 490,196 | 20.0 | 1.01 | 1.0 | 1.0 | 1.0 |
+| json | 80 | 625,000 | 35.3 | 2.01 | 0.78 | 1.77 | 1.99 |
+| varchar | 72 | 694,444 | 34.3 | 2.01 | 0.71 | 1.72 | 1.99 |
+| blob | 82 | 609,756 | 35.5 | 2.01 | 0.80 | 1.78 | 1.99 |
+
+Write × / Read × / Disk × are relative to RawDuck (`< 1` on Write × = faster write than RawDuck; `> 1` on Read/Disk × = slower or larger).
+
+**Takeaway:** opaque types win on **write**; RawDuck wins on **read** (~1.7×) and **disk** (~2× smaller). Gap grows on larger telemetry workloads — see [RawDuck BENCHMARK.md](https://github.com/quackscience/rawduck/blob/main/BENCHMARK.md).
 
 ## Links
 
