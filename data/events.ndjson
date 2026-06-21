@@ -1,0 +1,3 @@
+{"id": 1, "action": "click", "ts": "2024-01-15T10:30:00", "user": {"name": "alice", "plan": "pro"}}
+{"id": 2, "action": "view", "ts": "2024-01-15T10:31:00", "user": {"name": "bob"}}
+{"id": 3, "action": "purchase", "ts": "2024-01-15T10:32:00", "user": {"name": "carol", "plan": "enterprise"}, "amount": 99.5}

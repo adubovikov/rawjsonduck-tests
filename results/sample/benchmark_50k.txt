@@ -1,0 +1,81 @@
+RawDuck vs opaque storage — 2026-06-21T11:33:27+02:00
+Rows: 50000 | Source NDJSON: 6.10 MB
+Write CSV: /home/shurik/DUCKTEST/results/10_compare_write.csv | Read CSV: /home/shurik/DUCKTEST/results/10_compare_read.csv | Disk CSV: /home/shurik/DUCKTEST/results/10_compare_disk.csv
+
+
+Row counts (after write)
+┌─────────┬───────┐
+│ storage │ rows  │
+│ varchar │ int64 │
+├─────────┼───────┤
+│ rawduck │ 50000 │
+│ json    │ 50000 │
+│ varchar │ 50000 │
+│ blob    │ 50000 │
+└─────────┴───────┘
+
+Write speed — best of 3 runs
+┌─────────┬────────────┬──────────┬────────┬─────────────────┬──────────────┐
+│ Storage │ Write (ms) │  Rows/s  │  MB/s  │ On disk (bytes) │ On disk (MB) │
+│ varchar │   int64    │  double  │ double │      int64      │    double    │
+├─────────┼────────────┼──────────┼────────┼─────────────────┼──────────────┤
+│ rawduck │        102 │ 490196.0 │   59.8 │         1060864 │         1.01 │
+│ json    │         80 │ 625000.0 │  76.25 │         2109440 │         2.01 │
+│ varchar │         72 │ 694444.0 │  84.72 │         2109440 │         2.01 │
+│ blob    │         82 │ 609756.0 │  74.39 │         2109440 │         2.01 │
+└─────────┴────────────┴──────────┴────────┴─────────────────┴──────────────┘
+
+Read speed — best of 3 runs per query (ms)
+┌──────────────────────────────────────┬─────────┬───────┬─────────┬───────┐
+│                Query                 │ RawDuck │ JSON  │ VARCHAR │ BLOB  │
+│               varchar                │  int64  │ int64 │  int64  │ int64 │
+├──────────────────────────────────────┼─────────┼───────┼─────────┼───────┤
+│ Q1: GROUP BY action                  │      19 │    28 │      32 │    28 │
+│ Q2: filter click, GROUP BY user.name │      21 │    36 │      33 │    35 │
+│ Q3: sum(amount) WHERE amount > 100   │      20 │    41 │      39 │    44 │
+│ Q4: COUNT DISTINCT user.plan         │      20 │    36 │      33 │    35 │
+└──────────────────────────────────────┴─────────┴───────┴─────────┴───────┘
+
+Read speed — average per storage (ms)
+┌─────────┬───────────────┬─────────────────┬──────────────────┐
+│ Storage │ Avg read (ms) │ Best query (ms) │ Worst query (ms) │
+│ varchar │    double     │      int64      │      int64       │
+├─────────┼───────────────┼─────────────────┼──────────────────┤
+│ rawduck │          20.0 │              19 │               21 │
+│ json    │          35.3 │              28 │               41 │
+│ varchar │          34.3 │              32 │               39 │
+│ blob    │          35.5 │              28 │               44 │
+└─────────┴───────────────┴─────────────────┴──────────────────┘
+
+Read speedup vs RawDuck (× slower, by query)
+┌──────────────────────────────────────┬────────┬───────────┬────────┐
+│                Query                 │ JSON × │ VARCHAR × │ BLOB × │
+│               varchar                │ double │  double   │ double │
+├──────────────────────────────────────┼────────┼───────────┼────────┤
+│ Q1: GROUP BY action                  │   1.47 │      1.68 │   1.47 │
+│ Q2: filter click, GROUP BY user.name │   1.71 │      1.57 │   1.67 │
+│ Q3: sum(amount) WHERE amount > 100   │   2.05 │      1.95 │    2.2 │
+│ Q4: COUNT DISTINCT user.plan         │    1.8 │      1.65 │   1.75 │
+└──────────────────────────────────────┴────────┴───────────┴────────┘
+
+On-disk size
+┌─────────┬─────────┬────────┬──────────────┐
+│ Storage │  Bytes  │   MB   │ × vs RawDuck │
+│ varchar │  int64  │ double │    double    │
+├─────────┼─────────┼────────┼──────────────┤
+│ rawduck │ 1060864 │   1.01 │          1.0 │
+│ json    │ 2109440 │   2.01 │         1.99 │
+│ varchar │ 2109440 │   2.01 │         1.99 │
+│ blob    │ 2109440 │   2.01 │         1.99 │
+└─────────┴─────────┴────────┴──────────────┘
+
+Summary — write, read, disk
+┌─────────┬────────────┬──────────────┬───────────────┬──────────────┬───────────┬─────────┬────────┬────────┐
+│ Storage │ Write (ms) │ Write rows/s │ Read avg (ms) │ Disk (bytes) │ Disk (MB) │ Write × │ Read × │ Disk × │
+│ varchar │   int64    │    double    │    double     │    int64     │  double   │ double  │ double │ double │
+├─────────┼────────────┼──────────────┼───────────────┼──────────────┼───────────┼─────────┼────────┼────────┤
+│ rawduck │        102 │     490196.0 │          20.0 │      1060864 │      1.01 │     1.0 │    1.0 │    1.0 │
+│ json    │         80 │     625000.0 │          35.3 │      2109440 │      2.01 │    0.78 │   1.77 │   1.99 │
+│ varchar │         72 │     694444.0 │          34.3 │      2109440 │      2.01 │    0.71 │   1.72 │   1.99 │
+│ blob    │         82 │     609756.0 │          35.5 │      2109440 │      2.01 │     0.8 │   1.78 │   1.99 │
+└─────────┴────────────┴──────────────┴───────────────┴──────────────┴───────────┴─────────┴────────┴────────┘

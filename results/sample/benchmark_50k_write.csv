@@ -1,0 +1,5 @@
+storage,write_ms,disk_bytes
+rawduck,102,1060864
+json,80,2109440
+varchar,72,2109440
+blob,82,2109440

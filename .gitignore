@@ -1,0 +1,9 @@
+.cache/
+bin/
+results/*
+!results/sample/
+!results/sample/**
+data/compare_events.ndjson
+*.db
+*.duckdb
+*.wal

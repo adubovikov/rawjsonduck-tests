@@ -1,0 +1,17 @@
+query_id,storage,ms
+Q1,rawduck,19
+Q1,json,28
+Q1,varchar,32
+Q1,blob,28
+Q2,rawduck,21
+Q2,json,36
+Q2,varchar,33
+Q2,blob,35
+Q3,rawduck,20
+Q3,json,41
+Q3,varchar,39
+Q3,blob,44
+Q4,rawduck,20
+Q4,json,36
+Q4,varchar,33
+Q4,blob,35
