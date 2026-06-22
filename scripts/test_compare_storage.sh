@@ -11,6 +11,7 @@ BENCH="$ROOT/results/10_compare_bench.txt"
 WRITE_CSV="$ROOT/results/10_compare_write.csv"
 READ_CSV="$ROOT/results/10_compare_read.csv"
 DISK_CSV="$ROOT/results/10_compare_disk.csv"
+# defaults; overridden below when ROWS != 50000
 
 RAW_DB="$ROOT/results/10_bench_rawduck.db"
 JSON_DB="$ROOT/results/10_bench_json.duckdb"
@@ -85,6 +86,12 @@ bench_read_ms() {
 }
 
 ROWS="${1:-50000}"
+ROWS_K=$(( ROWS / 1000 ))
+OUT="$ROOT/results/10_compare_storage_${ROWS_K}k.log"
+BENCH="$ROOT/results/10_compare_bench_${ROWS_K}k.txt"
+WRITE_CSV="$ROOT/results/10_compare_write_${ROWS_K}k.csv"
+READ_CSV="$ROOT/results/10_compare_read_${ROWS_K}k.csv"
+DISK_CSV="$ROOT/results/10_compare_disk_${ROWS_K}k.csv"
 python3 "$ROOT/scripts/gen_compare_data.py" "$ROWS"
 SOURCE_BYTES=$(file_bytes "$NDJSON")
 SOURCE_MB=$(awk "BEGIN {printf \"%.2f\", $SOURCE_BYTES / 1048576}")
